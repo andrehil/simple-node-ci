@@ -26,11 +26,14 @@ inputs:
     description: 'The command that will be executed to start the application.'
     default: 'npm start'
   integration-test-lib:
-    description: 'The library used to run integration tests. Accepts "playwright", "cypress", or "" for custom tests.'
+    description: 'The library used to run integration tests. Accepts "playwright", "cypress", or "custom" for custom tests.'
     default: 'playwright'
   integration-test-command:
     description: 'The command that will be executed to run integration tests.'
     default: 'npm run test:pw'
+  integration-test-report-path:
+    description: 'The integration tests report path.'
+    default: 'playwright-report/'
 
 runs:
   using: 'composite'
@@ -70,16 +73,10 @@ runs:
     if: ${{ inputs.integration-test-lib == 'playwright' }}
     shell: bash
     run: npx playwright install --with-deps
-  - name: Run Playwright Tests
+  - name: Run Playwright tests
     if: ${{ inputs.integration-test-lib == 'playwright' }}
     shell: bash
     run: ${{ inputs.start-command }} & ${{ inputs.integration-test-command }}
-  - uses: actions/upload-artifact@v4
-    if: ${{ inputs.integration-test-lib == 'playwright' && !cancelled() }}
-    with:
-      name: playwright-report
-      path: playwright-report/
-      retention-days: 30
 
   # Cypress
   - name: Install Chrome
@@ -91,13 +88,19 @@ runs:
   - name: Install Edge
     if: ${{ inputs.integration-test-lib == 'cypress' }}
     uses: browser-actions/setup-edge@v1
-  - name: Run Cypress Tests
+  - name: Run Cypress tests
     if: ${{ inputs.integration-test-lib == 'cypress' }}
     shell: bash
     run: ${{ inputs.start-command }} & ${{ inputs.integration-test-command }}
+
+  # Custom
+  - name: Run custom integration tests
+    if: ${{ inputs.integration-test-lib == 'custom' }}
+    shell: bash
+    run: ${{ inputs.start-command }} & ${{ inputs.integration-test-command }}
+
   - uses: actions/upload-artifact@v4
-    if: ${{ inputs.integration-test-lib == 'cypress' && !cancelled() }}
     with:
-      name: cypress-report
-      path: cypress/results/
+      name: integration-tests-report
+      path: ${{ input.integration-test-report-path }}
       retention-days: 30

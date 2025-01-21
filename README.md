@@ -4,6 +4,16 @@ Simple opinionated node pipeline.
 
 If you want to add a simple CI pipeline to your Node/JS/TS project, just add a workflow yaml to your project as follows:
 
+Steps:
+- Git checkout
+- Install dependencies
+- Run CodeQL analysis
+- Run lint
+- Run build
+- Run unit tests
+- Run integrations tests (Playwright, Cypress, custom)
+- Upload integration tests result
+
 ```yaml
 name: CI
 
