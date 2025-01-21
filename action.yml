@@ -33,8 +33,12 @@ runs:
   using: 'composite'
   steps:
 
-  - name: CodeQL analysis
-    uses: actions/reusable-workflows/.github/workflows/codeql-analysis.yml@main
+  - name: Initialize CodeQL
+    uses: github/codeql-action/init@v3
+    with:
+      languages: 'javascript'
+  - name: Perform CodeQL Analysis
+    uses: github/codeql-action/analyze@v3
 
   - uses: actions/checkout@v4
   - uses: actions/setup-node@v4
