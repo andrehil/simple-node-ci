@@ -80,3 +80,24 @@ runs:
       name: playwright-report
       path: playwright-report/
       retention-days: 30
+
+  # Cypress
+  - name: Install Chrome
+    if: ${{ inputs.integration-test-lib == 'cypress' }}
+    uses: browser-actions/setup-chrome@v1
+  - name: Install Firefox
+    if: ${{ inputs.integration-test-lib == 'cypress' }}
+    uses: browser-actions/setup-firefox@v1
+  - name: Install Edge
+    if: ${{ inputs.integration-test-lib == 'cypress' }}
+    uses: browser-actions/setup-edge@v1
+  - name: Run Cypress Tests
+    if: ${{ inputs.integration-test-lib == 'cypress' }}
+    shell: bash
+    run: ${{ inputs.start-command }} & ${{ inputs.integration-test-command }}
+  - uses: actions/upload-artifact@v4
+    if: ${{ inputs.integration-test-lib == 'cypress' && !cancelled() }}
+    with:
+      name: test-results
+      path: test-results/
+      retention-days: 30
