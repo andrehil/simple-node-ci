@@ -1,0 +1,49 @@
+name: 'Node CI'
+description: 'Simple opinionated node CI pipeline'
+author: 'Andre Hildinger'
+inputs:
+  node-version:
+    description: 'Version Spec of the version to use. Examples: 12.x, 10.15.1, >=10.15.0.'
+    required: true
+  cache:
+    description: 'Used to specify a package manager for caching in the default directory. Supported values: npm, yarn, pnpm.'
+  cache-dependency-path:
+    description: 'Used to specify the path to a dependency file: package-lock.json, yarn.lock, etc. Supports wildcards or a list of file names for caching multiple dependencies.'
+
+runs:
+  using: 'composite'
+  steps:
+
+  - name: CodeQL analysis
+    uses: actions/reusable-workflows/.github/workflows/codeql-analysis.yml@main
+
+  - uses: actions/checkout@v4
+  - uses: actions/setup-node@v4
+    with:
+      node-version: ${{ inputs.node-version }}
+      cache: ${{ inputs.cache }}
+  - name: Install dependencies
+    shell: bash
+    run: npm ci
+
+  - name: Build
+    shell: bash
+    run: npm run build
+
+  - name: Run Unit Tests
+    shell: bash
+    run: npm test
+
+  # Playwright
+  - name: Install Playwright Browsers
+    shell: bash
+    run: npx playwright install --with-deps
+  - name: Run Playwright Tests
+    shell: bash
+    run: npm start & npm run test:pw
+  - uses: actions/upload-artifact@v4
+    if: ${{ !cancelled() }}
+    with:
+      name: playwright-report
+      path: playwright-report/
+      retention-days: 30
