@@ -2,8 +2,6 @@
 
 Simple opinionated node pipeline.
 
-If you want to add a simple CI pipeline to your Node/JS/TS project, just add a workflow yaml to your project as follows:
-
 Steps:
 - Git checkout
 - Install dependencies
@@ -12,7 +10,10 @@ Steps:
 - Run build
 - Run unit tests
 - Run integrations tests (Playwright, Cypress, custom)
-- Upload integration tests result
+  - For Playwright and Cypress, browsers are automatically downloaded
+- Upload integration test result
+
+If you want to add a simple CI pipeline to your Node/JS/TS project, just add a workflow yaml to your project as follows:
 
 ```yaml
 name: CI
@@ -38,7 +39,7 @@ jobs:
         node-version: lts/*
 ```
 
-Paremeters:
+Parameters:
   - **node-version**: (required) Version Spec of the version to use. Examples: 12.x, 10.15.1, >=10.15.0.
   - **cache**: (default: 'npm') A package manager for caching in the default directory. Supported values: npm, yarn, pnpm.'
   - **cache-dependency-path**: The path to a dependency file: package-lock.json, yarn.lock, etc. Supports wildcards or a list of file names for caching multiple dependencies.
