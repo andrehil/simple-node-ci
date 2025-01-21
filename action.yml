@@ -27,7 +27,7 @@ inputs:
     default: 'playwright'
   integration-test-command:
     description: 'The command that will be executed to run integration tests.'
-    default: 'npm test:pw'
+    default: 'npm run test:pw'
 
 runs:
   using: 'composite'
