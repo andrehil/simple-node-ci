@@ -7,8 +7,27 @@ inputs:
     required: true
   cache:
     description: 'Used to specify a package manager for caching in the default directory. Supported values: npm, yarn, pnpm.'
+    default: 'npm'
   cache-dependency-path:
     description: 'Used to specify the path to a dependency file: package-lock.json, yarn.lock, etc. Supports wildcards or a list of file names for caching multiple dependencies.'
+  install-command:
+    description: 'The command that will be executed to install the dependencies.'
+    default: 'npm ci'
+  build-command:
+    description: 'The command that will be executed to build the project.'
+    default: 'npm run build'
+  test-command:
+    description: 'The command that will be executed to run unit tests.'
+    default: 'npm test'
+  start-command:
+    description: 'The command that will be executed to start the application.'
+    default: 'npm start'
+  integration-test-lib:
+    description: 'The library used to run integration tests. Accepts "playwright", "cypress", or "" for custom tests.'
+    default: 'playwright'
+  integration-test-command:
+    description: 'The command that will be executed to run integration tests.'
+    default: 'npm test:pw'
 
 runs:
   using: 'composite'
@@ -22,27 +41,30 @@ runs:
     with:
       node-version: ${{ inputs.node-version }}
       cache: ${{ inputs.cache }}
+      cache-dependency-path: ${{ inputs.cache-dependency-path }}
   - name: Install dependencies
     shell: bash
-    run: npm ci
+    run: ${{ inputs.install-command }}
 
   - name: Build
     shell: bash
-    run: npm run build
+    run: ${{ inputs.build-command }}
 
   - name: Run Unit Tests
     shell: bash
-    run: npm test
+    run: ${{ inputs.test-command }}
 
   # Playwright
   - name: Install Playwright Browsers
+    if: ${{ inputs.integration-test-lib == 'playwright' }}
     shell: bash
     run: npx playwright install --with-deps
   - name: Run Playwright Tests
+    if: ${{ inputs.integration-test-lib == 'playwright' }}
     shell: bash
-    run: npm start & npm run test:pw
+    run: ${{ inputs.start-command }} & ${{ inputs.integration-test-command }}
   - uses: actions/upload-artifact@v4
-    if: ${{ !cancelled() }}
+    if: ${{ inputs.integration-test-lib == 'playwright' && !cancelled() }}
     with:
       name: playwright-report
       path: playwright-report/
