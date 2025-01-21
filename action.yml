@@ -102,5 +102,5 @@ runs:
   - uses: actions/upload-artifact@v4
     with:
       name: integration-tests-report
-      path: ${{ input.integration-test-report-path }}
+      path: ${{ inputs.integration-test-report-path }}
       retention-days: 30
