@@ -13,6 +13,9 @@ inputs:
   install-command:
     description: 'The command that will be executed to install the dependencies.'
     default: 'npm ci'
+  lint-command:
+    description: 'The command that will be executed to lint on the project.'
+    default: 'npm run lint'
   build-command:
     description: 'The command that will be executed to build the project.'
     default: 'npm run build'
@@ -49,6 +52,10 @@ runs:
       languages: 'javascript'
   - name: Perform CodeQL Analysis
     uses: github/codeql-action/analyze@v3
+
+  - name: Lint
+    shell: bash
+    run: ${{ inputs.lint-command }}
 
   - name: Build
     shell: bash
