@@ -15,7 +15,7 @@ inputs:
     default: 'npm ci'
   enable-codeql:
     description: 'Enabled CodeQL to run. You might want to set this to false if running on a private repo.'
-    default: false
+    default: true
   lint-command:
     description: 'The command that will be executed to lint on the project.'
     default: 'npm run lint'
@@ -53,12 +53,12 @@ runs:
     run: ${{ inputs.install-command }}
 
   - name: Initialize CodeQL
-    if: ${{ inputs.enable-codeql }}
+    if: ${{ inputs.enable-codeql == 'true' }}
     uses: github/codeql-action/init@v3
     with:
       languages: 'javascript'
   - name: Perform CodeQL Analysis
-    if: ${{ inputs.enable-codeql }}
+    if: ${{ inputs.enable-codeql == 'true' }}
     uses: github/codeql-action/analyze@v3
 
   - name: Lint
